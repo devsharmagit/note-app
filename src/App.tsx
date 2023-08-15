@@ -1,25 +1,36 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import "./App.css";
+import React, {useState, useEffect} from 'react'
+import Main from "./Components/Main";
+import Navbar from "./Components/Navbar";
+import { useDispatch, useSelector } from "react-redux";
+import Login from "./Components/Login";
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { auth } from "./config/firebase";
+import { loginOfUser } from "./redux/userSlice";
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+  
+  const [user1, loading, error] = useAuthState(auth)
+
+  const dispatch = useDispatch()
+
+ 
+  useEffect(()=>{
+    dispatch(loginOfUser({
+      name: user1?.displayName,
+      email: user1?.email,
+      photo: user1?.photoURL,
+      userId: user1?.uid
+    }))
+  }, [user1])
+
+  return (<>
+  {user1 ? <div className="max-w-screen-2xl m-auto">
+      <Navbar />
+      <Main  />
+    </div> : <Login /> }
+    
+  </>
   );
 }
 
