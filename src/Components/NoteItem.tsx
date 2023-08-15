@@ -297,7 +297,7 @@ function NoteItem({
         {title}
       </h1>
       <p
-        className={`leading-tight px-1  font-normal text-[16px] ${
+        className={`leading-tight px-1 mr-6  font-normal text-[16px] ${
           allDone && "line-through"
         } `}
       >

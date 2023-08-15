@@ -1,12 +1,14 @@
 import "./App.css";
-import React, {useState, useEffect} from 'react'
+import { useEffect} from 'react'
 import Main from "./Components/Main";
 import Navbar from "./Components/Navbar";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import Login from "./Components/Login";
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from "./config/firebase";
 import { loginOfUser } from "./redux/userSlice";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   
@@ -29,6 +31,8 @@ function App() {
       <Navbar />
       <Main  />
     </div> : <Login /> }
+
+    <ToastContainer />
     
   </>
   );

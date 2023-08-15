@@ -9,6 +9,7 @@ import { IconButton } from "@mui/material";
 import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import { setNoteCollection, setPath } from "../redux/noteSlice";
+import { toast } from "react-toastify";
 
 function CollDisplay() {
   const user = useSelector((state: any) => state.appRedux.userDetails);
@@ -34,11 +35,21 @@ function CollDisplay() {
   };
 
   const handleAddCollection = async() => {
-   const data = await addDoc(collRef, {
+   try {
+       await addDoc(collRef, {
       collectionName: collectionName,
       madeBy: user?.userId,
       time: serverTimestamp(),
     });
+    toast.success("Collection Successfully Created !", {autoClose: 2000,
+      position: toast.POSITION.BOTTOM_RIGHT
+    });
+   } catch (error) {
+    toast.error("Something went wrong!", {autoClose: 2000,
+      position: toast.POSITION.BOTTOM_RIGHT
+    });
+   }
+ 
     setCollectionName(""); 
     setAddCollOpen(false);
     console.log("New collection added:", collectionName);
@@ -108,7 +119,6 @@ function CollDisplay() {
       {NoteCollections &&
         NoteCollections?.docs.map((e) => (
           <CollectionItem
-          
             key={e.id}
             collectionName={e.data().collectionName as string}
             collId={e.id}

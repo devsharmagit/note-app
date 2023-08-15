@@ -22,6 +22,7 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import Chip from '@mui/material/Chip';
+import { ToastContainer, toast } from 'react-toastify';
 
 type Tag = {
   value: String;
@@ -193,17 +194,36 @@ function AddNoteModal(props: AddNoteModalProps) {
         if(props.type === "shared"){
           noteObj["assignedTo"] = personName
         }
-        await addDoc(noteCollRef, {
-         ...noteObj,
-          subTasks: subTask,
-          allDone: false,
-        })
+        try {
+          await addDoc(noteCollRef, {
+           ...noteObj,
+            subTasks: subTask,
+            allDone: false,
+          })
+          toast.success("Note Saved Successfully!", {autoClose: 2000,
+            position: toast.POSITION.BOTTOM_RIGHT
+          });
+        } catch (error) {
+          toast.error("Something went wrong!", {autoClose: 2000,
+            position: toast.POSITION.BOTTOM_RIGHT
+          });
+        }
        
       }else{
-        await addDoc(noteCollRef, {
-          ...noteObj,
-           subTasks: subTask,
-         })
+        try {
+          await addDoc(noteCollRef, {
+            ...noteObj,
+             subTasks: subTask,
+           })
+           toast.success("Note Saved Successfully!", {autoClose: 2000,
+            position: toast.POSITION.BOTTOM_RIGHT
+          });
+        } catch (error) {
+          toast.error("Something went wrong!", {autoClose: 2000,
+            position: toast.POSITION.BOTTOM_RIGHT
+          });
+        }
+      
       }
       if(noteModal.sharingType === "shared"){
         await addDoc(collection(db, "notification"), {
@@ -231,16 +251,36 @@ function AddNoteModal(props: AddNoteModalProps) {
         if(props.type === "shared"){
           noteObj["assignedTo"] = personName
         }
-        await updateDoc(noteRef, {
+        try {
+           await updateDoc(noteRef, {
          ...noteObj,
           subTasks: subTask,
           allDone: false,
         })
+        toast.success("Note Updated Successfully!", {autoClose: 2000,
+          position: toast.POSITION.BOTTOM_RIGHT
+        });
+        } catch (error) {
+          toast.error("Something went wrong!", {autoClose: 2000,
+            position: toast.POSITION.BOTTOM_RIGHT
+          });
+        }
+       
       }else{
-        await updateDoc(noteRef, {
+        try {
+           await updateDoc(noteRef, {
           ...noteObj,
            subTasks: subTask,
          })
+         toast.success("Note Updated Successfully!", {autoClose: 2000,
+          position: toast.POSITION.BOTTOM_RIGHT
+        });
+        } catch (error) {
+          toast.error("Something went wrong!", {autoClose: 2000,
+            position: toast.POSITION.BOTTOM_RIGHT
+          });
+        }
+       
       }
       if(noteModal.sharingType === "shared"){
         await addDoc(collection(db, "notification"), {

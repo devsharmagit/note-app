@@ -1,26 +1,20 @@
 import { Avatar } from '@mui/material';
-import React, { ReactComponentElement } from 'react'
-import AddRoundedIcon from '@mui/icons-material/AddRounded';
-import AddNoteSidebar from './AddNoteSidebar';
+import React from 'react'
 import { useDispatch, useSelector } from 'react-redux';
-import { jsx } from '@emotion/react';
 import { closeNoteArchive, openNoteArchive, setNoteCollection, setPath, setShareColl } from '../redux/noteSlice';
 import { signOut } from "firebase/auth";
 import { auth } from "../config/firebase";
-import { setServers } from 'dns/promises';
+
 
 type SidebarItemsProps ={
 avatar?: boolean;
-isCollection?: boolean;
-icon?: boolean;
 IconType?: React.ComponentType<{}>;
 iconText?: string;
 }
 
-function SlidebarItems({avatar, isCollection, icon, IconType,iconText}: SidebarItemsProps) {
+function SlidebarItems({avatar, IconType,iconText}: SidebarItemsProps) {
 
   const user = useSelector((state :any)=> state.appRedux.userDetails)
-  const noteColl = useSelector((state :any)=> state.note.noteCollection)
   const notePath = useSelector((state :any)=> state.note.path)
   const dispatch = useDispatch()
  
@@ -56,14 +50,10 @@ const handleClick = ()=>{
       <p className='text-white opacity-80 text-sm '>{user.email ? user?.email : "Guest@note.com"}</p>
         </div>
         </div> }
-    {
-        isCollection && <>
-        <AddNoteSidebar />
-        </>
-    }
+  
 
     {
-      IconType && <div onClick={handleClick} className={`flex gap-2 ${(iconText === "Archive" && notePath === "archive") ? "bg-slate-800" : "" } ${(iconText === "Home" && notePath === "home") ? "bg-slate-800" : "" } text-white cursor-pointer px-2 py-3 w-full hover:bg-slate-800 transition-all`}>
+      IconType && <div onClick={handleClick} className={`flex gap-2 ${(iconText === "Archive" && notePath === "archive") ? "bg-slate-800" : "" } ${(iconText === "Home" && notePath === "home") ? "bg-slate-800" : "" } text-white cursor-pointer px-2 py-2 w-full hover:bg-slate-800 transition-all`}>
         <IconType />
         <span> {iconText} </span>
       </div>
