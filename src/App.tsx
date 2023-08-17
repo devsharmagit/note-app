@@ -7,12 +7,12 @@ import Login from "./Components/Login";
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from "./config/firebase";
 import { loginOfUser } from "./redux/userSlice";
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   
-  const [user1, loading, error] = useAuthState(auth)
+  const [user1] = useAuthState(auth)
 
   const dispatch = useDispatch()
 

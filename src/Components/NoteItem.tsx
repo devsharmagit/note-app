@@ -1,4 +1,3 @@
-import React, { useEffect, useState } from "react";
 import PushPinOutlinedIcon from "@mui/icons-material/PushPinOutlined";
 import PushPinRoundedIcon from "@mui/icons-material/PushPinRounded";
 import { AvatarGroup, Avatar, IconButton } from "@mui/material";
@@ -12,23 +11,8 @@ import DeleteRoundedIcon from "@mui/icons-material/DeleteRounded";
 import ContentCopyRoundedIcon from "@mui/icons-material/ContentCopyRounded";
 import SendRoundedIcon from "@mui/icons-material/SendRounded";
 import NoteSubTask from "./NoteSubTask";
-import {
-  collection,
-  deleteDoc,
-  doc,
-  getDocs,
-  query,
-  updateDoc,
-  where,
-} from "firebase/firestore";
-import { useDispatch, useSelector } from "react-redux";
-import { db } from "../config/firebase";
-import {
-  openNoteModal,
-  setCopiedNotes,
-  setSelectedNotes,
-} from "../redux/noteSlice";
 import RestoreIcon from "@mui/icons-material/Restore";
+import useNoteItem from "../hooks/useNoteItem";
 
 type SubTask = {
   taskName: string;
@@ -44,7 +28,7 @@ type NoteItemProps = {
   noteId: string;
   title: string;
   desc: string;
-  time: Date;
+  time: any;
   tags: Tag[];
   noteType: "note" | "task";
   sharingType: "personal" | "shared";
@@ -56,6 +40,7 @@ type NoteItemProps = {
   assignedTo?: string[];
   collName: string;
   archive?: boolean;
+  isHome?: boolean;
 };
 
 function NoteItem({
@@ -73,202 +58,26 @@ function NoteItem({
   allDone,
   edited,
   assignedTo,
+  isHome,
   collName,
 }: NoteItemProps) {
-  const noteCollection = useSelector((state: any) => state.note.noteCollection);
-  const copiedNotes = useSelector((state: any) => state.note.copiedNotes);
-  const selectedNotes = useSelector((state: any) => state.note.selectedNotes);
-  const globalSelectNote = useSelector((state: any) => state.note.globalSelectNote);
-
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const [isHovered, setIsHovered] = useState<boolean>(false);
-  const [selectedNote, setSelectedNote] = useState(false);
-
-  const [stateTask, setStateTask] = useState<SubTask[]>(
-    subTasks ? subTasks : []
+  const {handleMouseEnter, handleMouseLeave, noteCollection, updateAllDone, updateTask, handlePinClick, isPinned, handleSelectClick, selectedNote, isHovered, open, handleClick, editedpersons, anchorEl, handleClose, handleEditClick, handleDeleteClick, handleCopy,handleRestoreClick, formattedDate} = useNoteItem({
+    archive,
+    title,
+    tags,
+    time,
+    desc,
+    noteType,
+    sharingType,
+    subTasks,
+    pinned,
+    color,
+    noteId,
+    allDone,
+    edited,
+    assignedTo,
+    collName}
   );
-  const [isPinned, setIsPinned] = useState(pinned);
-
-  const [allDonestate, setAllDone] = useState(allDone);
-
-  const open = Boolean(anchorEl);
-
-  const dispatch = useDispatch();
-
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-  const handleClose = () => {
-    setAnchorEl(null);
-    setIsHovered(false);
-  };
-
-  const handleMouseEnter = () => {
-    setIsHovered(true);
-  };
-
-  const handleMouseLeave = () => {
-    setIsHovered(false);
-  };
-
-  const updateTask = async (index: number, status: boolean) => {
-    if (noteId) {
-      setStateTask((prevState) => {
-        const updatedSubTask = [...prevState];
-        let taskToUpdate = updatedSubTask[index];
-        taskToUpdate = { ...taskToUpdate, isDone: !status };
-        updatedSubTask[index] = taskToUpdate;
-        return updatedSubTask;
-      });
-
-      const docRef = doc(
-        db,
-        `${sharingType === "personal" ? "notes" : "sharedNotes"}`,
-        noteId
-      );
-      console.log(noteId);
-      console.log(stateTask);
-      await updateDoc(docRef, {
-        subTasks: stateTask,
-      });
-    }
-  };
-
-  const [editedpersons, setEditedPersons] = useState<string[]>([]);
-
-  useEffect(() => {
-    const getUserDetails = async () => {
-      const q = query(
-        collection(db, "userDetails"),
-        where("userId", "in", edited)
-      );
-      const data = await getDocs(q);
-      let newarr: string[] = [];
-      data.docs.map((e) => {
-        newarr.push(e.data().photo);
-      });
-      setEditedPersons(newarr);
-    };
-    if (edited) {
-      getUserDetails();
-    }
-  }, [edited]);
-
-  const noteRef = doc(
-    db,
-    `${sharingType === "personal" ? "notes" : "sharedNotes"}`,
-    noteId
-  );
-
-  const handlePinClick = async () => {
-    await updateDoc(noteRef, {
-      pinned: !isPinned,
-    });
-    setIsPinned(!isPinned);
-  };
-
-  const updateAllDone = async (t: boolean) => {
-    await updateDoc(noteRef, {
-      allDone: t,
-    });
-  };
-
-  const handleRestoreClick = async () => {
-    if (archive) {
-      await updateDoc(noteRef, {
-        archive: false,
-      });
-    }
-  };
-
-  const handleEditClick = () => {
-    console.log("this motherfucker is got clicked");
-
-    dispatch(
-      openNoteModal({
-        isNoteModalOpen: true,
-        noteType: noteType,
-        noteId: noteId,
-        actionType: "edit",
-        title: title,
-        desc: desc,
-        tags: tags,
-        color: color,
-        subTasks: subTasks,
-        sharingType: sharingType,
-        pinned: pinned,
-        edited: edited,
-        assignedTo: assignedTo,
-      })
-    );
-    handleClose();
-  };
-
-  const noteObj = {
-    noteType: noteType,
-    noteTitle: title,
-    noteDesc: desc,
-    noteTags: tags,
-    noteColor: color,
-    subTasks: subTasks,
-    sharingType: sharingType,
-    pinned: pinned,
-    archive: false,
-    collName: collName,
-  };
-  const handleCopy = () => {
-    dispatch(
-      setCopiedNotes([
-        {
-          ...noteObj,
-        },
-      ])
-    );
-
-    handleClose();
-  };
-
-  const handleDeleteClick = async () => {
-    if (archive) {
-      await deleteDoc(noteRef);
-    } else {
-      await updateDoc(noteRef, {
-        archive: true,
-      });
-    }
-  };
-
-  const handleSelectClick = () => {
-    if (selectedNote === false) {
-      setSelectedNote(true);
-      console.log("inner selected notes");
-      if (selectedNotes === null) {
-        dispatch(setSelectedNotes([{  noteId: noteId, noteContent: {...noteObj} }]));
-      } else {
-        dispatch(setSelectedNotes([...selectedNotes, {  noteId: noteId, noteContent: {...noteObj} }]));
-      }
-    } else {
-      setSelectedNote(false);
-      let newArr = selectedNotes.filter((note :any)=>{
-        return note.noteId !== noteId
-      })
-      if(newArr.length === 0){
-        dispatch(setSelectedNotes(null))
-      }else{
-        dispatch(setSelectedNotes(newArr))
-      }
-    }
-  };
-
-
-  useEffect(()=>{
-    const resetSelect = ()=>{
-      if(selectedNotes === null){
-        setSelectedNote(false)
-      }
-    }
-    resetSelect()
-  }, [selectedNotes] )
 
   return (
     <div
@@ -362,17 +171,17 @@ function NoteItem({
       </IconButton>
 
       <div className="mt-3 flex items-center">
-        {tags?.map((e) => {
+        {tags?.map((e, i) => {
           return (
-            <span className="bg-slate-700 h-fit text-xs text-white px-2 py-[2px] mr-1 mt-2 rounded">
+            <span key={i} className="bg-slate-700 h-fit text-xs text-white px-2 py-[2px] mr-1 mt-2 rounded">
               {e.label}
             </span>
           );
         })}
         {sharingType === "shared" && (
           <AvatarGroup max={4} className="!w-fit mt-2 ">
-            {editedpersons.map((a) => {
-              return <Avatar src={a} />;
+            {editedpersons.map((a, i) => {
+              return <Avatar key={i} src={a} />;
             })}
           </AvatarGroup>
         )}
@@ -387,7 +196,7 @@ function NoteItem({
           "aria-labelledby": "basic-button",
         }}
       >
-        {!archive && (
+        {!archive && ( !isHome &&
           <MenuItem onClick={handleEditClick}>
             <EditRoundedIcon color="action" className="mr-2" /> Edit
           </MenuItem>
@@ -415,6 +224,9 @@ function NoteItem({
           </MenuItem>
         )}
       </Menu>
+      <p className="text-xs text-gray-400 relative top-[10px]">
+        {formattedDate}
+      </p>
     </div>
   );
 }

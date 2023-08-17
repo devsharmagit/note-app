@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import  {useState} from 'react'
 import AddNoteButton from './AddNoteButton'
 import NoteList from './NoteList'
 import { useDispatch, useSelector } from 'react-redux'
@@ -6,7 +6,7 @@ import { IconButton } from "@mui/material";
 import DeleteRoundedIcon from '@mui/icons-material/DeleteRounded';
 import { collection, deleteDoc, doc, getDocs, query, updateDoc, where } from 'firebase/firestore';
 import { db } from '../config/firebase';
-import { setNoteCollection, setShareColl } from '../redux/noteSlice';
+import {  setShareColl } from '../redux/noteSlice';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -46,7 +46,7 @@ function ShareNoteDisplay() {
           </div>
           <AddNoteButton type="shared"/>
           <NoteList type="shared" />
-{/* <NoteList /> */}
+
 <Dialog
         open={open}
         onClose={handleClose}

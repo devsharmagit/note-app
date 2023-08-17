@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import  { useEffect, useState } from "react";
 import Modal from "react-modal";
 import { useDispatch, useSelector } from "react-redux";
 import { Avatar, Button, IconButton } from "@mui/material";
@@ -8,7 +8,6 @@ import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import {
   addDoc,
   collection,
-  getDoc,
   getDocs,
   query,
   serverTimestamp,
@@ -16,12 +15,9 @@ import {
 } from "firebase/firestore";
 import { db } from "../config/firebase";
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded";
-import ClearRoundedIcon from "@mui/icons-material/ClearRounded";
 
 function AddSharedCollModal() {
   const [collName, setCollName] = useState<string>("");
-
-  const [disabled, setDisabled] = useState(true)
 
   const sharedCollModal = useSelector(
     (state: any) => state.note.sharedCollModal

@@ -1,10 +1,10 @@
-import { collection, query, where } from "firebase/firestore";
-import React from "react";
+import { collection, orderBy, query, where } from "firebase/firestore";
 import { useCollection } from "react-firebase-hooks/firestore";
 import { db } from "../config/firebase";
 import { useSelector } from "react-redux";
 import NoteItem from "./NoteItem";
 import ArchiveRoundedIcon from '@mui/icons-material/ArchiveRounded';
+import Skeleton from '@mui/material/Skeleton';
 
 function ArchiveNotes() {
   const user = useSelector((state: any) => state.appRedux.userDetails);
@@ -12,12 +12,12 @@ function ArchiveNotes() {
   const q = query(
     collection(db, "notes"),
     where("ownedBy", "==", user.userId),
-    where("archive", "==", true)
+    where("archive", "==", true),
+    orderBy("time", "desc")
   );
 
   const [archivedNotes, loading, error] = useCollection(q);
-console.log(loading)
-  console.log(error)
+
 
   return (
     <div className="w-full px-3">
@@ -26,6 +26,12 @@ console.log(loading)
       </div>
 
     <div className="flex flex-wrap gap-2">
+
+{loading && <div className="w-full">
+<Skeleton variant="rectangular" width={300} height={200} animation="wave" />
+</div>
+  }
+
       {archivedNotes?.empty && <div className="w-full h-full flex items-center justify-center">
          <p className="text-2xl text-slate-700">
         Deleted Notes will appear here!

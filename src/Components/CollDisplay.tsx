@@ -1,6 +1,13 @@
 import React, { useState } from "react";
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
-import { addDoc, collection, query, serverTimestamp, updateDoc, where } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  orderBy,
+  query,
+  serverTimestamp,
+  where,
+} from "firebase/firestore";
 import { db } from "../config/firebase";
 import { useDispatch, useSelector } from "react-redux";
 import { useCollection } from "react-firebase-hooks/firestore";
@@ -10,73 +17,87 @@ import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import { setNoteCollection, setPath } from "../redux/noteSlice";
 import { toast } from "react-toastify";
+import Skeleton from "@mui/material/Skeleton";
 
 function CollDisplay() {
   const user = useSelector((state: any) => state.appRedux.userDetails);
 
   const collRef = collection(db, "collections");
-  const q = query(collRef, where("madeBy", "==", `${user?.userId}`));
+  const q = query(
+    collRef,
+    where("madeBy", "==", `${user?.userId}`),
+    orderBy("time", "desc")
+  );
 
-  const [NoteCollections] = useCollection(q);
+  const [NoteCollections, loading, error] = useCollection(q);
 
   const [addCollOpen, setAddCollOpen] = useState(false);
-  const [collectionName, setCollectionName] = useState(""); 
+  const [collectionName, setCollectionName] = useState("");
 
   const handleCollClick = () => {
     setAddCollOpen(true);
-    console.log("Add collection clicked");
   };
 
   const handleClose = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
-    console.log("Close button clicked");
+
     setAddCollOpen(false);
-    setCollectionName(""); 
+    setCollectionName("");
   };
 
-  const handleAddCollection = async() => {
-   try {
-       await addDoc(collRef, {
-      collectionName: collectionName,
-      madeBy: user?.userId,
-      time: serverTimestamp(),
-    });
-    toast.success("Collection Successfully Created !", {autoClose: 2000,
-      position: toast.POSITION.BOTTOM_RIGHT
-    });
-   } catch (error) {
-    toast.error("Something went wrong!", {autoClose: 2000,
-      position: toast.POSITION.BOTTOM_RIGHT
-    });
-   }
- 
-    setCollectionName(""); 
+  const handleAddCollection = async () => {
+    try {
+      await addDoc(collRef, {
+        collectionName: collectionName,
+        madeBy: user?.userId,
+        time: serverTimestamp(),
+      });
+      toast.success("Collection Successfully Created !", {
+        autoClose: 2000,
+        position: toast.POSITION.BOTTOM_RIGHT,
+      });
+    } catch (error) {
+      toast.error("Something went wrong!", {
+        autoClose: 2000,
+        position: toast.POSITION.BOTTOM_RIGHT,
+      });
+    }
+
+    setCollectionName("");
     setAddCollOpen(false);
-    console.log("New collection added:", collectionName);
   };
 
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
-  const handleCollectionClick = (id :string, name: string)=>{
-    dispatch(setNoteCollection({
-      noteId: id,
-      noteCollName: name,
-    }))
-    dispatch(setPath("collection"))
-  }
+  const handleCollectionClick = (id: string, name: string) => {
+    dispatch(
+      setNoteCollection({
+        noteId: id,
+        noteCollName: name,
+      })
+    );
+    dispatch(setPath("collection"));
+  };
 
-  const CollectionItem = React.memo(({ collectionName, collId }: { collectionName: string, collId: string }) => (
-    <div
-    onClick={()=>handleCollectionClick(collId, collectionName)}
-      className="mt-5 cursor-pointer hover:bg-slate-200 transition-all hover:shadow-lg bg-white w-[300px] h-[200px] border-2 flex items-center justify-center border-gray-400 rounded-xl"
-    >
-      <TagRoundedIcon />
-      <span className="text-[20px] font-bold text-center">
-        {collectionName}
-      </span>
-    </div>
-  ));
-
+  const CollectionItem = React.memo(
+    ({
+      collectionName,
+      collId,
+    }: {
+      collectionName: string;
+      collId: string;
+    }) => (
+      <div
+        onClick={() => handleCollectionClick(collId, collectionName)}
+        className="mt-5 cursor-pointer hover:bg-slate-200 transition-all hover:shadow-lg bg-white w-[300px] h-[200px] border-2 flex items-center justify-center border-gray-400 rounded-xl"
+      >
+        <TagRoundedIcon />
+        <span className="text-[20px] font-bold text-center">
+          {collectionName}
+        </span>
+      </div>
+    )
+  );
 
   return (
     <div className="flex gap-4 flex-wrap">
@@ -94,7 +115,7 @@ function CollDisplay() {
                 value={collectionName}
                 onChange={(e) => setCollectionName(e.target.value)}
                 className="border border-1 border-gray-500 outline-none bg-transparent p-2 rounded-md"
-                />
+              />
               <IconButton onClick={handleAddCollection}>
                 <ArrowForwardRoundedIcon />
               </IconButton>
@@ -105,7 +126,7 @@ function CollDisplay() {
             >
               <CloseRoundedIcon />
             </IconButton>
-                </>
+          </>
         ) : (
           <>
             <AddRoundedIcon className="text-5xl" />
@@ -115,6 +136,29 @@ function CollDisplay() {
           </>
         )}
       </div>
+
+      {loading && (
+        <>
+          <Skeleton
+            width={300}
+            height={200}
+            animation="wave"
+            variant="rectangular"
+          />
+          <Skeleton
+            width={300}
+            height={200}
+            animation="wave"
+            variant="rectangular"
+          />
+          <Skeleton
+            width={300}
+            height={200}
+            animation="wave"
+            variant="rectangular"
+          />
+        </>
+      )}
 
       {NoteCollections &&
         NoteCollections?.docs.map((e) => (

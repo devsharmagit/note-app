@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import PersonRoundedIcon from "@mui/icons-material/PersonRounded";
 import GroupsRoundedIcon from "@mui/icons-material/GroupsRounded";
 import AddNoteButton from "./AddNoteButton";
@@ -157,6 +157,7 @@ function NotesConsole() {
       </div>
 
 <ConfirmDialog open={open} handleClose={handleClose} />
+
     
     </div>
   );

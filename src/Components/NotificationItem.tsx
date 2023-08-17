@@ -1,5 +1,5 @@
 import { doc, updateDoc } from 'firebase/firestore';
-import React, {useEffect} from 'react'
+import {useEffect} from 'react'
 import { useSelector } from 'react-redux';
 import { auth, db } from '../config/firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
@@ -14,7 +14,7 @@ type NotiItemProps ={
 
 function NotificationItem({message, readBy,photo, docId}:NotiItemProps) {
 
-    const [user1, loading, error] = useAuthState(auth)
+    const [user1] = useAuthState(auth)
     const notificationOpen = useSelector((state :any) => state.appRedux.notificationOpen)
 
     const checkRead = ()=>{

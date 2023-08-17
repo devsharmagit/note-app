@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from 'react'
-import { useStateManager } from 'react-select';
-import { Button, IconButton } from "@mui/material";
+import  { useEffect, useState } from 'react'
+import {  IconButton } from "@mui/material";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 
 type SubTaskProps = {
@@ -12,8 +11,10 @@ type SubTaskProps = {
 
 function SubTask({taskName, isDone, onChange, onDelete }: SubTaskProps) {
 
+  console.log("this is taskname " + taskName)
+
     const [done, setDone] = useState<boolean>(isDone)
-    const [newTaskname, setNewTaskName] = useState<string>("")
+    const [newTaskname, setNewTaskName] = useState<string>(taskName)
 
    useEffect(()=>{
     onChange(newTaskname, done)

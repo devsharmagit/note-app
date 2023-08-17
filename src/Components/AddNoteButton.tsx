@@ -58,7 +58,7 @@ function AddNoteButton(props: AddNoteButtonProps) {
           <Button
           className="!bg-slate-800"
           name={"task"} onClick={handleClickOpen} variant="contained" endIcon={<ChecklistRoundedIcon />}>
-            Add Note
+            Add Task
           </Button>
         </div>
       </div>

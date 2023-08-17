@@ -30,7 +30,8 @@ function AddNoteSidebar() {
   const collRef = collection(db, "collections");
   const q = query(
     collRef,
-    where("madeBy", "==", `${user?.userId}`)
+    where("madeBy", "==", `${user?.userId}`),
+    orderBy("time", "asc")
   );
   const [NoteCollections] = useCollection(q);
 
